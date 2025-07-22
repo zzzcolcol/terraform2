@@ -23,35 +23,41 @@ module "eks" {
 
 
 
+  tags = {
+    Example    = local.name
+    GithubRepo = "terraform-aws-eks"
+    GithubOrg  = "terraform-aws-modules"
+  }
 
-  enable_irsa = true
+
+  # enable_irsa = true
 
 
-  eks_managed_node_groups = {
-    default = {
-      name            = "eks-nodes"
-      desired_size    = 3
-      max_size        = 3
-      min_size        = 0
-      instance_types  = ["t3.medium"]
+  # eks_managed_node_groups = {
+  #   default = {
+  #     name            = "eks-nodes"
+  #     desired_size    = 2
+  #     max_size        = 3
+  #     min_size        = 0
+  #     instance_types  = ["t3.large"]
 
-      force_update_version = true
+  #     force_update_version = true
       
 
-      launch_template = {
-        id      = aws_launch_template.eks_lt.id
-        version = "$Latest"
-      }
-            iam_role_additional_policies = {
-        SSM = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-        LOG = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-      }
+  #     launch_template = {
+  #       id      = aws_launch_template.eks_lt.id
+  #       version = "$Latest"
+  #     }
+  #           iam_role_additional_policies = {
+  #       SSM = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+  #       LOG = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  #     }
 
-      tags = {
-        Name = "eks-nodes"
-      }
-    }
-  }
+  #     tags = {
+  #       Name = "eks-nodes"
+  #     }
+  #   }
+  # }
 
 cluster_addons = {
   vpc-cni = {

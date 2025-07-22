@@ -1,34 +1,39 @@
-variable "aws_region" {
-    description = "region 입력"
-    type = string
-    default = "ap-northeast-2"
-}
-
 variable "vpc_cidr" {
-    description = "vpc cidr block : 입력"
-    type = string
+  default = "10.0.0.0/16"
 }
 
-variable "public_subnets" {
-    description = "public subnet cidr block : 입력"
-    type = list(string)
+variable "azs" {
+  type    = list(string)
+  default = ["ap-south-1a", "ap-south-1c"]
 }
 
 variable "private_subnets" {
-    description = "private subnet cidr block : 입력"
-    type = list(string)
-  
+  type    = list(string)
+  default = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
+variable "public_subnets" {
+  type    = list(string)
+  default = ["10.0.10.0/24", "10.0.11.0/24"]
+}
 
 variable "cluster_name" {
-    description = "eks cluster name : 입력"
-    type = string
-  
+  default = "kkj-eks-cluster"
 }
 
-variable "availability_zones" {
-  description = "사용할 가용 영역 목록"
-  type        = list(string)
+variable "cluster_version" {
+  default = "1.30"
 }
 
+variable "tags" {
+  type = map(string)
+  default = {
+    Terraform   = "true"
+    Environment = "dev"
+  }
+}
+variable "region" {
+  description = "AWS region"
+  type        = string
+  default     = "ap-south-1"
+}

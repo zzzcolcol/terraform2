@@ -1,37 +1,53 @@
 terraform {
-    required_version = ">=1.5.0"
-    required_providers {
-        aws = {
-        source  = "hashicorp/aws"
-        version = "~> 3.0"
-        }
+  required_version = ">= 1.3"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.95.0"
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.11"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.24"
+    }
+  }
 }
 
 provider "aws" {
-  region = var.aws_region
-}
-
-# VPC 모듈 호출
-module "vpc" {
-  source = "./vpc"
-  vpc_cidr = var.vpc_cidr
-  public_subnets = var.public_subnets
-  private_subnets = var.private_subnets
-  availability_zones = var.availability_zones
- 
+  region = var.region
 }
 
 
-# EKS 모듈 호출
-module "eks" {
-    source  = "./eks"
-    cluster_name = var.cluster_name
-    vpc_id = module.vpc.vpc_id
-    private_subnets = module.vpc.private_subnets
-    role_arn = module.iam.eks_role_arn
-    node_role_arn = module.iam.node_role_arn
+
+
+provider "kubernetes" {
+  config_path = "~/.kube/config"
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  token                  = data.aws_eks_cluster_auth.eks.token
 }
-module "iam" {
-    source = "./iam"
+
+provider "helm" {
+  alias = "eks"
+  kubernetes {
+    # host                   = module.eks.cluster_endpoint
+    # cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+    # token                  = data.aws_eks_cluster_auth.eks.token
+    config_path = "~/.kube/config"
+  }
 }
+
+data "aws_eks_cluster" "eks" {
+  name = module.eks.cluster_name
+  depends_on = [module.eks]
+}
+
+data "aws_eks_cluster_auth" "eks" {
+  name = module.eks.cluster_name
+  depends_on = [module.eks]
+}
+
